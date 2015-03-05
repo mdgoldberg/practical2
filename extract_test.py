@@ -98,19 +98,24 @@ def make_design_mat(fds, global_feat_dict=None):
     return X, feat_dict
 
 
-if len(sys.argv) >= 2:
-    out_csv = sys.argv[1]
+if len(sys.argv) >= 3:
+    in_json = sys.argv[1]
+    out_csv = sys.argv[2]
 else:
-    print 'usage: python extraction.py outfile.csv'
+    print 'usage: python extraction.py global_feat_dict.json outfile.csv'
     sys.exit(0)
 
+with open(in_json, 'r') as f:
+    global_feat_dict = json.load(f)
+
 print 'extracting features'
-X_train, global_feat_dict, ids = extract_feats(features.ffs, 'test')
+X_train, global_feat_dict, ids = extract_feats(features.ffs, 'test',
+        global_feat_dict)
 X_train = X_train.todense()
-global_feat_dict = {v: k for k, v in global_feat_dict.items()}
+inverse_feat_dict = {v: k for k, v in global_feat_dict.items()}
 print 'converting to dataframe'
-phi = pd.DataFrame(X_train, index=ids, columns=[global_feat_dict[i] for i in
-    xrange(len(global_feat_dict))])
+phi = pd.DataFrame(X_train, index=ids, columns=[inverse_feat_dict[i] for i in
+    xrange(len(inverse_feat_dict))])
 
 print 'writing to csv'
 phi.to_csv(out_csv)
