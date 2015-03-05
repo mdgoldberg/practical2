@@ -101,7 +101,7 @@ def make_design_mat(fds, global_feat_dict=None):
 if len(sys.argv) >= 2:
     out_csv = sys.argv[1]
 else:
-    print 'usage: python extract_test.py outfile.csv'
+    print 'usage: python extraction.py outfile.csv'
     sys.exit(0)
 
 print 'extracting features'
