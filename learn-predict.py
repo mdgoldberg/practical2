@@ -34,7 +34,6 @@ def main():
     with open('train_classes.json', 'r') as t_classes:
         classes = json.load(t_classes)
     t_train = [classes[ID] for ID in train_ids]
-    #print train_ids
 
     print "reading test"
     with open(sys.argv[2], 'r') as tester:
@@ -46,14 +45,10 @@ def main():
     X_test = test_df
     test_ids = test_df.index
 
-    #train_dir = "train"
-    #test_dir = "test"
     trainoutput = "trainpredictions.csv"
     testoutput = "testpredictions.csv"  # feel free to change this or take it as an argument
 
-    #X_train,global_feat_dict,t_train,train_ids = extract_feats(ffs, train_dir)
 
-    
     # TODO train here, and learn your classification parameters
     print "learning..."
     rbf_feature = RBFSampler(gamma=0.00075, random_state=1000)
@@ -66,13 +61,11 @@ def main():
     #model = BernoulliNB(alpha=0.0000000001,binarize=0.1, fit_prior=True, class_prior=None)
     model = KNeighborsClassifier(n_neighbors=5, weights='distance', algorithm='auto', leaf_size=30, p=2, metric='minkowski', metric_params=None)
     model.fit(X_features, t_train)
-    #learned_W = np.random.random((len(global_feat_dict),len(util.malware_classes)))
     print "done learning"
     print
-
-    trainpreds = model.predict(X_features)
-
-    util.write_predictions(trainpreds, train_ids, trainoutput)
+    
+    # test how well we're doing on the training data
+    print 'proportion of training data classified correctly:', model.score(X_features, t_train)
     
     # get rid of training data and load test data
     #del X_train
