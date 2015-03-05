@@ -32,7 +32,7 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     """
     fds = [] # list of feature dicts
     ids = [] 
-    for datafile in os.listdir(direc)[:2]:
+    for datafile in os.listdir(direc):
         # extract id and true class (if available) from filename
         id_str,clazz = datafile.split('.')[:2]
         ids.append(id_str)
@@ -101,13 +101,12 @@ def make_design_mat(fds, global_feat_dict=None):
 if len(sys.argv) >= 2:
     out_csv = sys.argv[1]
 else:
-    print 'usage: python extraction.py outfile.csv'
+    print 'usage: python extract_test.py outfile.csv'
     sys.exit(0)
 
 print 'extracting features'
-X_train, global_feat_dict, ids = extract_feats(features.ffs, 'train')
+X_train, global_feat_dict, ids = extract_feats(features.ffs, 'test')
 X_train = X_train.todense()
-print X_train[:2]
 global_feat_dict = {v: k for k, v in global_feat_dict.items()}
 print 'converting to dataframe'
 phi = pd.DataFrame(X_train, index=ids, columns=[global_feat_dict[i] for i in
