@@ -75,6 +75,7 @@ except ImportError:
     import xml.etree.ElementTree as ET
 import numpy as np
 from scipy import sparse
+from sklearn import linear_model as lm
 
 import util
 
@@ -99,7 +100,7 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     """
     fds = [] # list of feature dicts
     classes = []
-    ids = [] 
+    ids = []
     for datafile in os.listdir(direc):
         # extract id and true class (if available) from filename
         id_str,clazz = datafile.split('.')[:2]
@@ -240,12 +241,16 @@ def main():
     # extract features
     print "extracting training features..."
     X_train,global_feat_dict,t_train,train_ids = extract_feats(ffs, train_dir)
+    print X_train.shape
+    print X_train
     print "done extracting training features"
     print
     
     # TODO train here, and learn your classification parameters
     print "learning..."
-    learned_W = np.random.random((len(global_feat_dict),len(util.malware_classes)))
+    model = lm.LogisticRegression(penalty='l2', dual=False, tol=0.0001, C=1.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None)
+    model.fit(X_train, t_train)
+    #learned_W = np.random.random((len(global_feat_dict),len(util.malware_classes)))
     print "done learning"
     print
     
@@ -260,7 +265,8 @@ def main():
     
     # TODO make predictions on text data and write them out
     print "making predictions..."
-    preds = np.argmax(X_test.dot(learned_W),axis=1)
+    preds = model.predict(X_test)
+    #preds = np.argmax(X_test.dot(learned_W),axis=1)
     print "done making predictions"
     print
     
