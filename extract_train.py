@@ -103,7 +103,7 @@ if len(sys.argv) >= 3:
     out_csv = sys.argv[1]
     out_json = sys.argv[2]
 else:
-    print 'usage: python extract_test.py outfile.csv globalfeatdict_file.json'
+    print 'usage: python extract_test.py outfile.csv outfile.json'
     sys.exit(0)
 
 print 'extracting features'
