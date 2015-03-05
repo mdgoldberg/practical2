@@ -77,4 +77,59 @@ def stringify(tree):
             c["stringified-"+el.tag] =ET.tostring(el)
     return c
 
-ffs = [first_last_system_call_feats, system_call_count_feats, stringify]
+def each_syscall_count(tree):
+    """
+    gets the number of times each system call is called
+    """
+    counter = Counter()
+    c = Counter()
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            counter['num-' + syscall.tag] += 1
+    return counter
+
+
+def num_processes(tree):
+    """
+    gets the number of processes in the exe
+    """
+    c = Counter()
+    for proc in tree.iter('process'):
+        c['num_processes'] += 1
+    return c
+
+def num_threads(tree):
+    """
+    gets the number of threads in the exe
+    """
+    c = Counter()
+    for thread in tree.iter('thread'):
+        c['num_threads'] += 1
+    return c
+
+def threads_per_process(tree):
+    c = Counter()
+    lst = []
+    for proc in tree.iter('proc'):
+        tot = 0
+        for thread in proc:
+            tot += 1
+        list.append(tot)
+    mn = np.mean(lst) if lst else 1.0
+    return {'threads_per_process': mn}
+
+def percent_successful_syscalls(tree):
+    succ = 0
+    tot = 0
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if 'successful' not in syscall.attrib:
+                continue
+            if syscall.attrib['successful'] == "1":
+                succ += 1
+            tot += 1
+    return {'percent_successful': succ/float(tot)}
+
+ffs = [first_last_system_call_feats, system_call_count_feats,
+        each_syscall_count, num_processes, num_threads, threads_per_process,
+        percent_successful_syscalls]
