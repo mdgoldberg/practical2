@@ -56,4 +56,18 @@ def system_call_count_feats(tree):
             c['num_system_calls'] += 1
     return c
 
-ffs = [first_last_system_call_feats, system_call_count_feats]
+def each_syscall_count(tree):
+    """
+    gets the number of times each system call is called
+    """
+    counter = Counter()
+    c = Counter()
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec.iter():
+            counter['num-' + syscall.tag] += 1
+    return counter
+
+
+ffs = [first_last_system_call_feats, system_call_count_feats,
+        each_syscall_count]
+
