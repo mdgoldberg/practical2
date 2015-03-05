@@ -1,5 +1,6 @@
 *.pyc
 *.csv
+*.json
 *.zip
 *.tar
 *.gz

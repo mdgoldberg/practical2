@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 import util
 import features
 import numpy as np
@@ -98,19 +99,23 @@ def make_design_mat(fds, global_feat_dict=None):
     return X, feat_dict
 
 
-if len(sys.argv) >= 2:
+if len(sys.argv) >= 3:
     out_csv = sys.argv[1]
+    out_json = sys.argv[2]
 else:
-    print 'usage: python extraction.py outfile.csv'
+    print 'usage: python extract_test.py outfile.csv globalfeatdict_file.json'
     sys.exit(0)
 
 print 'extracting features'
 X_train, global_feat_dict, ids = extract_feats(features.ffs, 'train')
+print 'converting to dense matrix'
 X_train = X_train.todense()
-global_feat_dict = {v: k for k, v in global_feat_dict.items()}
+inverted_feat_dict = {v: k for k, v in global_feat_dict.items()}
 print 'converting to dataframe'
-phi = pd.DataFrame(X_train, index=ids, columns=[global_feat_dict[i] for i in
-    xrange(len(global_feat_dict))])
+phi = pd.DataFrame(X_train, index=ids, columns=[inverted_feat_dict[i] for i in
+    xrange(len(inverted_feat_dict))])
 
-print 'writing to csv'
+print 'writing to csv and json'
 phi.to_csv(out_csv)
+with open(out_json, 'w') as f:
+    json.dump(global_feat_dict, f)
