@@ -32,7 +32,7 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     """
     fds = [] # list of feature dicts
     ids = [] 
-    for datafile in os.listdir(direc):
+    for datafile in os.listdir(direc)[:2]:
         # extract id and true class (if available) from filename
         id_str,clazz = datafile.split('.')[:2]
         ids.append(id_str)
@@ -106,6 +106,8 @@ else:
 
 print 'extracting features'
 X_train, global_feat_dict, ids = extract_feats(features.ffs, 'train')
+X_train = X_train.todense()
+print X_train[:2]
 global_feat_dict = {v: k for k, v in global_feat_dict.items()}
 print 'converting to dataframe'
 phi = pd.DataFrame(X_train, index=ids, columns=[global_feat_dict[i] for i in

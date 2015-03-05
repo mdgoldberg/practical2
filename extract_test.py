@@ -106,6 +106,7 @@ else:
 
 print 'extracting features'
 X_train, global_feat_dict, ids = extract_feats(features.ffs, 'test')
+X_train = X_train.todense()
 global_feat_dict = {v: k for k, v in global_feat_dict.items()}
 print 'converting to dataframe'
 phi = pd.DataFrame(X_train, index=ids, columns=[global_feat_dict[i] for i in
