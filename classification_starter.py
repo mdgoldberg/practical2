@@ -78,6 +78,7 @@ from scipy import sparse
 from sklearn import linear_model as lm
 
 import util
+import features
 
 
 def extract_feats(ffs, direc="train", global_feat_dict=None):
@@ -179,55 +180,7 @@ def make_design_mat(fds, global_feat_dict=None):
 # (i.e., the result of parsing an xml file) and returns a dictionary mapping 
 # feature-names to numeric values.
 ## TODO: modify these functions, and/or add new ones.
-def first_last_system_call_feats(tree):
-    """
-    arguments:
-      tree is an xml.etree.ElementTree object
-    returns:
-      a dictionary mapping 'first_call-x' to 1 if x was the first system call
-      made, and 'last_call-y' to 1 if y was the last system call made. 
-      (in other words, it returns a dictionary indicating what the first and 
-      last system calls made by an executable were.)
-    """
-    c = Counter()
-    in_all_section = False
-    first = True # is this the first system call
-    last_call = None # keep track of last call we've seen
-    for el in tree.iter():
-        # ignore everything outside the "all_section" element
-        if el.tag == "all_section" and not in_all_section:
-            in_all_section = True
-        elif el.tag == "all_section" and in_all_section:
-            in_all_section = False
-        elif in_all_section:
-            if first:
-                c["first_call-"+el.tag] = 1
-                first = False
-            last_call = el.tag  # update last call seen
-            
-    # finally, mark last call seen
-    c["last_call-"+last_call] = 1
-    return c
-
-def system_call_count_feats(tree):
-    """
-    arguments:
-      tree is an xml.etree.ElementTree object
-    returns:
-      a dictionary mapping 'num_system_calls' to the number of system_calls
-      made by an executable (summed over all processes)
-    """
-    c = Counter()
-    in_all_section = False
-    for el in tree.iter():
-        # ignore everything outside the "all_section" element
-        if el.tag == "all_section" and not in_all_section:
-            in_all_section = True
-        elif el.tag == "all_section" and in_all_section:
-            in_all_section = False
-        elif in_all_section:
-            c['num_system_calls'] += 1
-    return c
+## SEE FEATURES FILE
 
 ## The following function does the feature extraction, learning, and prediction
 def main():
@@ -236,7 +189,7 @@ def main():
     outputfile = "mypredictions.csv"  # feel free to change this or take it as an argument
     
     # TODO put the names of the feature functions you've defined above in this list
-    ffs = [first_last_system_call_feats, system_call_count_feats]
+    ffs = features.ffs
     
     # extract features
     print "extracting training features..."
