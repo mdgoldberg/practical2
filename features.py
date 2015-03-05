@@ -56,4 +56,25 @@ def system_call_count_feats(tree):
             c['num_system_calls'] += 1
     return c
 
-ffs = [first_last_system_call_feats, system_call_count_feats]
+def stringify(tree):
+    """
+    arguments:
+      tree is an xml.etree.ElementTree object
+    returns:
+      a dictionary mapping 'num_system_calls' to the number of system_calls
+      made by an executable (summed over all processes)
+    """
+    c = Counter()
+    in_all_section = False
+    #print len(tree.findall('all_section'))
+    for el in tree.iter():
+        # ignore everything outside the "all_section" element
+        if el.tag == "all_section" and not in_all_section:
+            in_all_section = True
+        elif el.tag == "all_section" and in_all_section:
+            in_all_section = False
+        elif in_all_section:
+            c["stringified-"+el.tag] =ET.tostring(el)
+    return c
+
+ffs = [first_last_system_call_feats, system_call_count_feats, stringify]
