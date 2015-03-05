@@ -5,10 +5,11 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 import numpy as np
-from scipy import sparse
+#from scipy import sparse
 from sklearn import linear_model as lm
 import pandas as pd
 import sys
+import json
 
 import util
 
@@ -18,28 +19,26 @@ def main():
     with open(sys.argv[1], 'r') as trainer:
 
         # Produce a CSV file.
-        train_df = pd.read_csv(trainer, delimiter=',', quotechar='"')
+        train_df = pd.read_csv(trainer, delimiter=',', quotechar='"', index_col=0)
     print("done reading")
 
-    train_df.head()
+    X_train = train_df
+    train_ids = train_df.index
 
-    X_train = []
-    t_train = []
-    train_ids = []
-
+    with open('train_classes.json', 'r') as t_classes:
+        classes = json.load(t_classes)
+    t_train = [classes[ID] for ID in train_ids]
+    #print train_ids
 
     print "reading test"
     with open(sys.argv[2], 'r') as tester:
 
         # Produce a CSV file.
-        test_df = pd.read_csv(tester, delimiter=',', quotechar='"')
+        test_df = pd.read_csv(tester, delimiter=',', quotechar='"', index_col=0)
     print("done reading")
 
-    test_df.head()
-
-    X_test = []
-    test_ids = []
-
+    X_test = test_df
+    test_ids = test_df.index
 
     #train_dir = "train"
     #test_dir = "test"
@@ -57,14 +56,14 @@ def main():
     print "done learning"
     print
 
-    trainpreds = model.predict(X_train)
+    #trainpreds = model.predict(X_train)
 
-    util.write_predictions(trainpreds, train_ids, trainoutput)
+    #util.write_predictions(trainpreds, train_ids, trainoutput)
     
     # get rid of training data and load test data
-    del X_train
-    del t_train
-    del train_ids
+    #del X_train
+    #del t_train
+    #del train_ids
     print "extracting test features..."
     #X_test,_,t_ignore,test_ids = extract_feats(ffs, test_dir, global_feat_dict=global_feat_dict)
     print "done extracting test features"
