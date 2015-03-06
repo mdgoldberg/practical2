@@ -36,7 +36,8 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     c = Counter()
     i = 1
     for datafile in os.listdir(direc):
-        print 'processing file ', i
+        if i % 50 == 0:
+            print 'processing file ', i
         i += 1
         # extract id and true class (if available) from filename
         id_str,clazz = datafile.split('.')[:2]
