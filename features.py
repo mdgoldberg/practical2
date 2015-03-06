@@ -6,7 +6,6 @@ except ImportError:
     import xml.etree.ElementTree as ET
 import numpy as np
 from scipy import sparse
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 def first_last_system_call_feats(tree, fn):
     """
@@ -68,7 +67,6 @@ def stringify(tree, fn):
     """
     c = Counter()
     in_all_section = False
-    #print len(tree.findall('all_section'))
     for el in tree.iter():
         # ignore everything outside the "all_section" element
         if el.tag == "all_section" and not in_all_section:
@@ -132,27 +130,8 @@ def percent_successful_syscalls(tree, fn):
             tot += 1
     return {'percent_successful': succ/float(tot)}
 
-train_vectorizer = TfidfVectorizer(input='filename', max_features=32)
-print 'fitting train vectorizer'
-train_vectorizer.fit(['train/' + x for x in os.listdir('train')])
-print 'done. building train analyzer'
-analyze_train = train_vectorizer.build_analyzer()
-test_vectorizer = TfidfVectorizer(input='filename', max_features=32)
-print 'done. building test vectorizer'
-test_vectorizer.fit(['test/' + x for x in os.listdir('test')])
-print 'done. building test analyzer'
-analyze_test = test_vectorizer.build_analyzer()
 
-def sklearn_features(tree, fn):
-    ret = {}
-    if fn.split('/')[-1] == 'train':
-        res = analyze_train(fn)
-    else:
-        res = analyze_test(fn)
-    for i, x in enumerate(res):
-        ret[x] = i+1
-    return ret
 
 ffs = [first_last_system_call_feats, system_call_count_feats,
         each_syscall_count, num_processes, num_threads, threads_per_process,
-        percent_successful_syscalls, sklearn_features]
+        percent_successful_syscalls]
