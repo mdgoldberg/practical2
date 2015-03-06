@@ -163,6 +163,43 @@ def vm_protect_targets(tree, fn):
                 c['vm_protect-'+syscall.attrib['target']] += 1
     return c
 
+def access_kernel(tree, fn):
+    succ = 0
+    tot = 1
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if 'address' not in syscall.attrib:
+                continue
+            if syscall.attrib['address'] >= 0x80000000:
+                succ += 1
+            tot += 1
+    return {'percent_successful': succ/float(tot)}
+
+def access_asked(tree, fn):
+    succ = 0
+    tot = 1
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if 'desiredaccess' not in syscall.attrib:
+                continue
+            if syscall.attrib['desiredaccess'] == "FILE_ANY_ACCESS":
+                succ += 1
+            tot += 1
+    return {'percent_successful': succ/float(tot)}
+
+def access_received(tree, fn):
+    succ = 0
+    tot = 1
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if 'sharedaccess' not in syscall.attrib:
+                continue
+            if syscall.attrib['sharedaccess'] == "FILE_ANY_ACCESS":
+                succ += 1
+            tot += 1
+    return {'percent_successful': succ/float(tot)}
+
 ffs = [first_last_system_call_feats, system_call_count_feats,
         each_syscall_count, num_processes, num_threads, threads_per_process,
-        percent_successful_syscalls, load_dll_files, vm_protect_targets]
+        percent_successful_syscalls, load_dll_files, vm_protect_targets, access_kernel,
+        access_asked, access_received]
