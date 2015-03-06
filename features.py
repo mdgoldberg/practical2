@@ -1,3 +1,4 @@
+import os
 from collections import Counter
 try:
     import xml.etree.cElementTree as ET
@@ -6,7 +7,7 @@ except ImportError:
 import numpy as np
 from scipy import sparse
 
-def first_last_system_call_feats(tree):
+def first_last_system_call_feats(tree, fn):
     """
     arguments:
       tree is an xml.etree.ElementTree object
@@ -36,7 +37,7 @@ def first_last_system_call_feats(tree):
     c["last_call-"+last_call] = 1
     return c
 
-def system_call_count_feats(tree):
+def system_call_count_feats(tree, fn):
     """
     arguments:
       tree is an xml.etree.ElementTree object
@@ -56,7 +57,7 @@ def system_call_count_feats(tree):
             c['num_system_calls'] += 1
     return c
 
-def stringify(tree):
+def stringify(tree, fn):
     """
     arguments:
       tree is an xml.etree.ElementTree object
@@ -66,7 +67,6 @@ def stringify(tree):
     """
     c = Counter()
     in_all_section = False
-    #print len(tree.findall('all_section'))
     for el in tree.iter():
         # ignore everything outside the "all_section" element
         if el.tag == "all_section" and not in_all_section:
@@ -77,7 +77,7 @@ def stringify(tree):
             c["stringified-"+el.tag] =ET.tostring(el)
     return c
 
-def each_syscall_count(tree):
+def each_syscall_count(tree, fn):
     """
     gets the number of times each system call is called
     """
@@ -89,7 +89,7 @@ def each_syscall_count(tree):
     return counter
 
 
-def num_processes(tree):
+def num_processes(tree, fn):
     """
     gets the number of processes in the exe
     """
@@ -98,7 +98,7 @@ def num_processes(tree):
         c['num_processes'] += 1
     return c
 
-def num_threads(tree):
+def num_threads(tree, fn):
     """
     gets the number of threads in the exe
     """
@@ -107,7 +107,7 @@ def num_threads(tree):
         c['num_threads'] += 1
     return c
 
-def threads_per_process(tree):
+def threads_per_process(tree, fn):
     c = Counter()
     lst = []
     for proc in tree.iter('proc'):
@@ -118,7 +118,7 @@ def threads_per_process(tree):
     mn = np.mean(lst) if lst else 1.0
     return {'threads_per_process': mn}
 
-def percent_successful_syscalls(tree):
+def percent_successful_syscalls(tree, fn):
     succ = 0
     tot = 0
     for all_sec in tree.iter('all_section'):
@@ -129,6 +129,8 @@ def percent_successful_syscalls(tree):
                 succ += 1
             tot += 1
     return {'percent_successful': succ/float(tot)}
+
+
 
 ffs = [first_last_system_call_feats, system_call_count_feats,
         each_syscall_count, num_processes, num_threads, threads_per_process,

@@ -33,17 +33,30 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     """
     fds = [] # list of feature dicts
     ids = [] 
+    c = Counter()
+    i = 1
     for datafile in os.listdir(direc):
+        print 'processing file ', i
+        i += 1
         # extract id and true class (if available) from filename
         id_str,clazz = datafile.split('.')[:2]
         ids.append(id_str)
         rowfd = {}
         # parse file as an xml document
         tree = ET.parse(os.path.join(direc,datafile))
+        for all_sec in tree.iter('all_section'):
+            for syscall in all_sec:
+                for k in syscall.attrib:
+                    if k == 'desiredaccess' and clazz == 'None':
+                        pass #print clazz, syscall.tag, syscall.attrib
+                    c[k] += 1
         # accumulate features
-        [rowfd.update(ff(tree)) for ff in ffs]
+        for ff in ffs:
+            rowfd.update(ff(tree, direc + '/' + datafile))
         fds.append(rowfd)
-        
+
+    print c.most_common()
+
     X,feat_dict = make_design_mat(fds,global_feat_dict)
     return X, feat_dict, ids
 
@@ -115,7 +128,8 @@ print 'converting to dataframe'
 phi = pd.DataFrame(X_train, index=ids, columns=[inverted_feat_dict[i] for i in
     xrange(len(inverted_feat_dict))])
 
-print 'writing to csv and json'
+print 'writing to csv'
 phi.to_csv(out_csv)
+print 'writing to json'
 with open(out_json, 'w') as f:
     json.dump(global_feat_dict, f)
