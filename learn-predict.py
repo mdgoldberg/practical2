@@ -15,7 +15,7 @@ from sklearn.kernel_approximation import RBFSampler
 from sklearn.neighbors import KNeighborsClassifier as KNC
 from sklearn.svm import SVC
 from sklearn.tree import ExtraTreeClassifier as ETC
-from sklearn.ensemble import RandomForestClassifier as RFC, GradientBoostingClassifier as GBC
+from sklearn.ensemble import RandomForestClassifier as RFC, GradientBoostingClassifier as GBC, BaggingClassifier as BC
 from sklearn import cross_validation as CV
 
 import util
@@ -56,20 +56,16 @@ def main():
     # X_features = rbf_feature.fit_transform(X_train)
     #X_features = X_train
     #model = lm.LogisticRegression(penalty='l1', dual=False, tol=1.0, C=100000.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None)
-    #model = mix.GMM(n_components=1, covariance_type='diag', random_state=None, thresh=0.01, min_covar=0.001, n_iter=100, n_init=1, params='wmc', init_params='wmc')
-    #model = MultinomialNB()
-    #model = BernoulliNB()
     #model = KNC(n_neighbors=5, weights='distance', algorithm='auto', p=1)
-    model = RFC(n_estimators=100, n_jobs=-1, criterion='gini') # this one is best so far
-    #model = GBC(n_estimators=100, learning_rate=0.001, max_depth=4) # consistently 0.87 in CV
-    #model = ETC()
-
+    model = RFC(n_estimators=500, n_jobs=-1, criterion='gini') # this one is best so far
+    #model = GBC(n_estimators=15, learning_rate=0.001, max_depth=3) # consistently 0.87 in CV
+    
     model.fit(X_train, t_train) # was X_features
     print "done learning"
     print
     
     # test how well we're doing on the training data
-    cv_model = RFC(n_estimators=100, n_jobs=-1, criterion='gini')
+    cv_model = RFC(n_estimators=500, n_jobs=-1, criterion='gini') # this one is best so far
     cv_scores = CV.cross_val_score(cv_model, X_train, t_train, cv=5)
     print 'cross-validation scores:', cv_scores
     print 'mean:', np.mean(cv_scores)

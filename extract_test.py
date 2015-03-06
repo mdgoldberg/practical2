@@ -123,4 +123,4 @@ phi = pd.DataFrame(X_train, index=ids, columns=[inverse_feat_dict[i] for i in
     xrange(len(inverse_feat_dict))])
 
 print 'writing to csv'
-phi.to_csv(out_csv)
+phi.to_csv(out_csv, encoding='utf-8')
