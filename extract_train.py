@@ -33,7 +33,10 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
     """
     fds = [] # list of feature dicts
     ids = [] 
-    c = Counter()
+    c_none = Counter()
+    a_none = Counter()
+    c_mal = Counter()
+    a_mal = Counter()
     i = 1
     for datafile in os.listdir(direc):
         if i % 50 == 0:
@@ -45,18 +48,23 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
         rowfd = {}
         # parse file as an xml document
         tree = ET.parse(os.path.join(direc,datafile))
-        for all_sec in tree.iter('all_section'):
-            for syscall in all_sec:
-                for k in syscall.attrib:
-                    if k == 'desiredaccess' and clazz == 'None':
-                        pass #print clazz, syscall.tag, syscall.attrib
-                    c[k] += 1
+        # for all_sec in tree.iter('all_section'):
+        #     for syscall in all_sec:
+        #         if syscall.tag == 'vm_protect':
+        #             print clazz, syscall.attrib
         # accumulate features
         for ff in ffs:
             rowfd.update(ff(tree, direc + '/' + datafile))
         fds.append(rowfd)
 
-    print c.most_common()
+    # print 'safe syscalls:'
+    # print c_none.most_common()
+    # print 'malicious syscalls:'
+    # print c_mal.most_common()
+    # print 'safe syscall-attributes:'
+    # print a_none.most_common()
+    # print 'malicious syscall-attributes:'
+    # print a_mal.most_common()
 
     X,feat_dict = make_design_mat(fds,global_feat_dict)
     return X, feat_dict, ids
@@ -130,7 +138,7 @@ phi = pd.DataFrame(X_train, index=ids, columns=[inverted_feat_dict[i] for i in
     xrange(len(inverted_feat_dict))])
 
 print 'writing to csv'
-phi.to_csv(out_csv)
+phi.to_csv(out_csv, encoding='utf-8')
 print 'writing to json'
 with open(out_json, 'w') as f:
     json.dump(global_feat_dict, f)

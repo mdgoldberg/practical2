@@ -130,8 +130,39 @@ def percent_successful_syscalls(tree, fn):
             tot += 1
     return {'percent_successful': succ/float(tot)}
 
+# NOT BEING USED
+def syscalls_per_thread_and_proc(tree, fn):
+    num_threads = 0
+    num_procs = 0
+    num_syscalls = 0
+    for proc in tree.iter('process'):
+        num_procs += 1
+        for thread in proc.iter('thread'):
+            num_threads += 1
+            if len(thread):
+                for syscall in thread.find('all_section'):
+                    num_syscalls += 1
+    return {'syscalls_per_thread': float(num_syscalls)/num_threads if
+            num_threads else num_syscalls, 'syscalls_per_proc':
+            float(num_syscalls)/num_procs if num_procs else num_syscalls}
 
+
+def load_dll_files(tree, fn):
+    c = Counter()
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if syscall.tag == 'load_dll' and 'filename' in syscall.attrib:
+                c['load_dll-'+syscall.attrib['filename']] += 1
+    return c
+
+def vm_protect_targets(tree, fn):
+    c = Counter()
+    for all_sec in tree.iter('all_section'):
+        for syscall in all_sec:
+            if syscall.tag == 'vm_protect' and 'target' in syscall.attrib:
+                c['vm_protect-'+syscall.attrib['target']] += 1
+    return c
 
 ffs = [first_last_system_call_feats, system_call_count_feats,
         each_syscall_count, num_processes, num_threads, threads_per_process,
-        percent_successful_syscalls]
+        percent_successful_syscalls, load_dll_files, vm_protect_targets]
