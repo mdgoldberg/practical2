@@ -41,7 +41,7 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
         # parse file as an xml document
         tree = ET.parse(os.path.join(direc,datafile))
         # accumulate features
-        [rowfd.update(ff(tree)) for ff in ffs]
+        [rowfd.update(ff(tree, direc + '/' + datafile)) for ff in ffs]
         fds.append(rowfd)
         
     X,feat_dict = make_design_mat(fds,global_feat_dict)
@@ -115,7 +115,8 @@ print 'converting to dataframe'
 phi = pd.DataFrame(X_train, index=ids, columns=[inverted_feat_dict[i] for i in
     xrange(len(inverted_feat_dict))])
 
-print 'writing to csv and json'
+print 'writing to csv'
 phi.to_csv(out_csv)
+print 'writing to json'
 with open(out_json, 'w') as f:
     json.dump(global_feat_dict, f)

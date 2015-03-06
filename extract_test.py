@@ -41,7 +41,7 @@ def extract_feats(ffs, direc="train", global_feat_dict=None):
         # parse file as an xml document
         tree = ET.parse(os.path.join(direc,datafile))
         # accumulate features
-        [rowfd.update(ff(tree)) for ff in ffs]
+        [rowfd.update(ff(tree, direc + '/' + datafile)) for ff in ffs]
         fds.append(rowfd)
         
     X,feat_dict = make_design_mat(fds,global_feat_dict)
