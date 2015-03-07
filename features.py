@@ -160,9 +160,16 @@ def vm_protect_targets(tree, fn):
     for all_sec in tree.iter('all_section'):
         for syscall in all_sec:
             if syscall.tag == 'vm_protect' and 'target' in syscall.attrib:
+                print syscall.attrib['target']
                 c['vm_protect-'+syscall.attrib['target']] += 1
     return c
 
 ffs = [first_last_system_call_feats, system_call_count_feats,
-        each_syscall_count, num_processes, num_threads, threads_per_process,
-        percent_successful_syscalls, load_dll_files, vm_protect_targets]
+        num_processes,
+        num_threads,
+        threads_per_process,
+        each_syscall_count,
+        percent_successful_syscalls,
+        load_dll_files,
+        vm_protect_targets
+        ]
