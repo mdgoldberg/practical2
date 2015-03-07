@@ -56,6 +56,14 @@ def main():
     # X_features = rbf_feature.fit_transform(X_train)
     #X_features = X_train
     #model = lm.LogisticRegression(penalty='l1', dual=False, tol=1.0, C=100000.0, fit_intercept=True, intercept_scaling=1, class_weight=None, random_state=None)
+    #model = mix.GMM(n_components=1, covariance_type='diag', random_state=None, thresh=0.01, min_covar=0.001, n_iter=100, n_init=1, params='wmc', init_params='wmc')
+    #model = MultinomialNB()
+    #model = BernoulliNB()
+    #model = SVC(C=1000,kernel='rbf')
+    #model = KNC(n_neighbors=5, weights='distance', algorithm='auto', p=1)
+    #model = RFC(n_estimators=50, n_jobs=-1, oob_score=True, criterion='gini', min_samples_split=5, max_leaf_nodes=100000) # this one is best so far
+    #model = GBC(n_estimators=100, learning_rate=0.001, max_depth=4) # consistently 0.87 in CV
+    #model = ETC()
     #model = KNC(n_neighbors=5, weights='distance', algorithm='auto', p=1)
     model = RFC(n_estimators=500, n_jobs=-1, criterion='gini') # this one is best so far
     #model = GBC(n_estimators=15, learning_rate=0.001, max_depth=3) # consistently 0.87 in CV
@@ -65,12 +73,17 @@ def main():
     print
     
     # test how well we're doing on the training data
+    #cv_model = RFC(n_estimators=50, n_jobs=-1, oob_score=True, criterion='gini', min_samples_split=5, max_leaf_nodes=100000)
+    #cv_model = MultinomialNB()
+    #cv_model = KNC(n_neighbors=5, weights='distance', algorithm='auto', p=1)
+
     cv_model = RFC(n_estimators=500, n_jobs=-1, criterion='gini') # this one is best so far
     cv_scores = CV.cross_val_score(cv_model, X_train, t_train, cv=5)
     print 'cross-validation scores:', cv_scores
     print 'mean:', np.mean(cv_scores)
     
     print "making predictions..."
+
     # X_testfeatures = rbf_feature.transform(X_test)
     testpreds = model.predict(X_test) # was X_testfeatures
     #preds = np.argmax(X_test.dot(learned_W),axis=1)
