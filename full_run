@@ -1,0 +1,3 @@
+python extract_train.py train_feats.csv gfd.json ;
+python extract_test.py gfd.json test_feats.csv ;
+python learn-predict.py train_feats.csv test_feats.csv
